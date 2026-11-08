@@ -44,10 +44,15 @@ def dp_invetory(items, capacity, hp, Write):
 
     res = [dp[i][len(items)-1] for i in range(len(items))]
     ans = [0]
+    all_ans = []
+
     for i in res:
         if i[0] > 0:
+            all_ans.append(i)
             if i[0] > ans[0]:
                 ans = i
+                
+
     if Write:
         list = dp
         for i in range(len(items)):
@@ -59,7 +64,25 @@ def dp_invetory(items, capacity, hp, Write):
                 else:
                     print((list[i][j][0]), end=' ')
             print()
-    return ans
+    return ans, all_ans
+
+def output_inventory(items, inventory, i, ans):
+    for item in items:
+            if item.name in ans[2]:
+                for _ in range(item.size):
+                    i += 1
+                    inventory[i] = item.name
+    line = 3
+    for x in range(3):
+        for j in inventory:
+            if inventory.count(j) == 3-x:
+                for y in j:
+                    print(f'[{y}]', end=' ')
+                    line -= 1
+            if line == 0:
+                line = 3 
+                print()
+                continue
 
 if __name__ == '__main__':
     items = [
@@ -76,9 +99,9 @@ if __name__ == '__main__':
     Item("s", 2, 20),
     Item("c", 2, 20),]
 
-    capacity = 9 
-    hp = 15
-    inventory = ['' for _ in range(capacity)]
+    capacity = int(input('Введите вместимость: '))
+    hp = int(input('Введите очки выживания: '))
+    inventory = [' ' for _ in range(capacity)]
 
     #БЕРЕМ ИНГОЛЯТОР
     ing_capacity = items[0].size
@@ -86,26 +109,41 @@ if __name__ == '__main__':
     capacity -= ing_capacity
     hp += ing_sp
     i = 0
-    inventory[i] = items[0].name
-    items.remove(items[0]) #так как нам обязательно нужен инголятор то просто добавим его параметры изначально, а его из списка удалим
+    inventory[i] = items[0].name 
 
-    ans = dp_invetory(items, capacity, hp, True)
+    ans, all_ans = dp_invetory(items[1:], capacity, hp, True)#так как нам обязательно нужен инголятор то просто добавим его параметры изначально, а его из списка удалим
 
-    print('\n', 'Подходящий вариант из таблицы', ans, '\n')
+    if ans == [0]:
+        print('\n', 'Решений не существует')
+    else:
+        output_inventory(items, inventory, i, ans)
+    
+# ---------------------------------------------------- 
 
-    for item in items:
-        if item.name in ans[2]:
-            for _ in range(item.size):
-                i += 1
-                inventory[i] = item.name
-    line = 3
-    for x in range(3):
-        for j in inventory:
-            if inventory.count(j) == 3-x:
-                for y in j:
-                    print(f'[{y}]', end=' ')
-                    line -= 1
-            if line == 0:
-                line = 3 
-                print()
-                continue
+    capacity = int(input('Введите вместимость(без инголятора): '))
+    hp = int(input('Введите очки выживания(без инголятора): '))
+    i = -1
+    inventory = [' ' for _ in range(capacity)]
+
+    ans, all_ans = dp_invetory(items, capacity, hp, True)
+    
+    if ans == [0]:
+        print('\n', 'Решений не существует')
+    else:
+        output_inventory(items, inventory, i, ans)
+
+# ----------------------------------------------------
+
+    capacity = int(input('Введите вместимость(без инголятора): '))
+    hp = int(input('Введите очки выживания(без инголятора): '))
+    
+    ans, all_ans = dp_invetory(items, capacity, hp, True)
+        
+    if ans == [0]:
+        print('\n', 'Решений не существует')
+    else:
+        for ans_1 in all_ans:
+            i = -1
+            inventory = [' ' for _ in range(capacity-ans_1[1])]
+            output_inventory(items, inventory, i, ans_1)
+            print()
